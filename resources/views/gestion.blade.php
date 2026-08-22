@@ -37,7 +37,8 @@
     .gov-header .lang-selector {
       margin-left: auto;
     }
-    .gov-header .lang-selector button {
+    .gov-header .lang-selector button,
+    .gov-header .logout-btn {
       background-color: rgba(255,255,255,0.2);
       border: 1px solid rgba(255,255,255,0.3);
       color: white;
@@ -47,7 +48,8 @@
       font-size: 12px;
       transition: background-color 0.2s;
     }
-    .gov-header .lang-selector button:hover {
+    .gov-header .lang-selector button:hover,
+    .gov-header .logout-btn:hover {
       background-color: rgba(255,255,255,0.3);
     }
 
@@ -522,6 +524,10 @@
   <div class="lang-selector">
     <button type="button" title="English">EN</button>
   </div>
+  <form action="{{ route('logout') }}" method="POST" style="margin-left: 8px; display: flex; align-items: center;">
+    @csrf
+    <button type="submit" class="logout-btn" title="{{ auth()->user()->name }}">Cerrar sesión</button>
+  </form>
 </header>
 
 <div class="main-wrapper">

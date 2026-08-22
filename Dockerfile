@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y \
 # Activar mod_rewrite
 RUN a2enmod rewrite
 
+# Instalar Node.js 22 (requerido por Vite 7)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
 # Copiar composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
