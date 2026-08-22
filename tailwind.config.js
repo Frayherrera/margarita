@@ -12,7 +12,17 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['"Public Sans"', ...defaultTheme.fontFamily.sans],
+                display: ['"Alfa Slab One"', 'serif'],
+                mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+            },
+            colors: {
+                tinta: '#26180D',
+                caoba: '#5f4383',
+                crema: '#F3EAD8',
+                ambar: '#E09A32',
+                billete: '#1F6F50',
+                ladrillo: '#B4472E',
             },
         },
     },

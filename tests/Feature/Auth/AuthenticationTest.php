@@ -10,6 +10,11 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_root_redirects_to_login(): void
+    {
+        $this->get('/')->assertRedirect(route('login'));
+    }
+
     public function test_login_screen_can_be_rendered(): void
     {
         $response = $this->get('/login');
@@ -27,7 +32,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('gestion', absolute: false));
+        $response->assertRedirect(route('panel.dashboard', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
@@ -49,7 +54,7 @@ class AuthenticationTest extends TestCase
         $response = $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('login'));
     }
 
     public function test_gestion_page_requires_authentication(): void

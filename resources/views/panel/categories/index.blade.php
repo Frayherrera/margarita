@@ -2,50 +2,49 @@
 @section('title', 'Categorías')
 
 @section('content')
-<h1 class="text-2xl font-bold tracking-tight mb-6">Categorías de productos</h1>
+<h1 class="mb-1 font-display text-2xl tracking-wide md:text-3xl">CATEGORÍAS</h1>
+<p class="mb-6 text-sm text-stone-500">Organiza el catálogo por tipo de producto.</p>
 
 <div class="grid gap-6 lg:grid-cols-3">
-    <div class="lg:col-span-2 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+    <div class="card overflow-hidden lg:col-span-2">
+        <table class="rtable min-w-full divide-y divide-stone-200 text-sm">
+            <thead class="bg-stone-50 text-left font-mono text-[11px] uppercase tracking-wider text-stone-400">
                 <tr>
                     <th class="px-4 py-3">Nombre</th>
                     <th class="px-4 py-3 text-right">Productos</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="px-4 py-3"><span class="sr-only">Acciones</span></th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody>
                 @forelse ($categories as $category)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-medium">{{ $category->name }}</td>
-                        <td class="px-4 py-3 text-right text-gray-500">{{ $category->products_count }}</td>
-                        <td class="px-4 py-3 text-right whitespace-nowrap">
-                            <a href="{{ route('panel.categorias.edit', $category) }}" class="font-medium text-emerald-600 hover:text-emerald-800">Editar</a>
-                            <form action="{{ route('panel.categorias.destroy', $category) }}" method="POST" class="inline ml-3"
+                    <tr>
+                        <td data-label="Categoría" class="px-4 py-3 font-medium">{{ $category->name }}</td>
+                        <td data-label="Productos" class="px-4 py-3 text-right font-mono">{{ $category->products_count }}</td>
+                        <td data-label="" class="whitespace-nowrap px-4 py-3 text-right">
+                            <a href="{{ route('panel.categorias.edit', $category) }}" class="link-edit">Editar</a>
+                            <form action="{{ route('panel.categorias.destroy', $category) }}" method="POST" class="mt-1 inline sm:ml-3 sm:mt-0"
                                   onsubmit="return confirm('¿Eliminar «{{ $category->name }}»?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="font-medium text-red-500 hover:text-red-700">Eliminar</button>
+                                <button type="submit" class="link-danger">Eliminar</button>
                             </form>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="px-4 py-10 text-center text-gray-400">Sin categorías.</td></tr>
+                    <tr><td colspan="3" class="px-4 py-12 text-center text-stone-400">Sin categorías.<br>Crea la primera en el formulario de la derecha.</td></tr>
                 @endforelse
             </tbody>
         </table>
+        <div class="border-t border-stone-200 p-3">{{ $categories->links() }}</div>
     </div>
 
-    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm self-start">
-        <h2 class="font-semibold mb-3">Nueva categoría</h2>
-        <form action="{{ route('panel.categorias.store') }}" method="POST" class="flex flex-col gap-3">
+    <div class="card self-start p-5">
+        <h2 class="font-mono text-xs font-semibold uppercase tracking-widest text-stone-400">Nueva categoría</h2>
+        <form action="{{ route('panel.categorias.store') }}" method="POST" class="mt-3 flex flex-col gap-3">
             @csrf
-            <input type="text" name="name" placeholder="Ej: Cervezas" required value="{{ old('name') }}"
-                   class="block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
-            <button type="submit" class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Crear</button>
+            <input type="text" name="name" placeholder="Ej: Cervezas" required value="{{ old('name') }}" class="input !mt-0">
+            <button type="submit" class="btn-primary w-full">Crear categoría</button>
         </form>
     </div>
 </div>
-
-<div class="mt-4">{{ $categories->links() }}</div>
 @endsection

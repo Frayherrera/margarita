@@ -2,9 +2,10 @@
 @section('title', 'Nuevo producto')
 
 @section('content')
-<h1 class="text-2xl font-bold tracking-tight mb-6">Nuevo producto</h1>
+<h1 class="mb-1 font-display text-2xl tracking-wide md:text-3xl">NUEVO PRODUCTO</h1>
+<p class="mb-6 text-sm text-stone-500">Agrega una referencia al catálogo de la bodega.</p>
 
-<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+<div class="card max-w-3xl p-5 sm:p-6">
     <form action="{{ route('panel.productos.store') }}" method="POST">
         @csrf
         @include('panel.products._form')

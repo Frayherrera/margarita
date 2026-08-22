@@ -7,9 +7,7 @@ use App\Http\Controllers\Panel\InventoryController;
 use App\Http\Controllers\Panel\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => redirect()->route('login'))->name('home');
 
 Route::get('/gestion', function () {
     return view('gestion');

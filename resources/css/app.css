@@ -1,3 +1,101 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-ambar px-4 py-2.5 text-sm font-bold text-tinta shadow-sm transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta active:translate-y-px;
+    }
+
+    .btn-ghost {
+        @apply inline-flex items-center justify-center rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta;
+    }
+
+    .field-label {
+        @apply block text-xs font-semibold uppercase tracking-wide text-stone-500;
+    }
+
+    .input {
+        @apply mt-1.5 block w-full rounded-lg border-stone-300 bg-white shadow-sm transition focus:border-ambar focus:ring-ambar sm:text-sm;
+    }
+
+    .card {
+        @apply rounded-xl border border-stone-200/80 bg-white shadow-[0_1px_3px_rgba(38,24,13,0.08)];
+    }
+
+    /* Sellos de estado */
+    .stamp {
+        @apply inline-flex whitespace-nowrap rounded border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider;
+    }
+    .stamp-in { @apply stamp border-billete/40 bg-billete/10 text-billete; }
+    .stamp-out { @apply stamp border-ladrillo/40 bg-ladrillo/10 text-ladrillo; }
+    .stamp-neutral { @apply stamp border-stone-300 bg-stone-100 text-stone-600; }
+
+    .link-edit { @apply font-medium text-caoba underline-offset-2 hover:underline; }
+    .link-danger { @apply font-medium text-ladrillo underline-offset-2 hover:underline; }
+}
+
+/* ── Tabla → fichas en móvil ── */
+@media (max-width: 639.98px) {
+    .rtable thead { display: none; }
+    .rtable tbody { display: block; }
+    .rtable tr {
+        display: block;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid #e7e5e4;
+    }
+    .rtable tr:last-child { border-bottom: none; }
+    .rtable td, .rtable td:first-child {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.3rem 1rem;
+        border: none;
+        text-align: right;
+    }
+    .rtable td[data-label]::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #a8a29e;
+        text-align: left;
+    }
+}
+
+/* ── Firma: borde perforado de recibo ── */
+.receipt { position: relative; }
+.receipt::after {
+    content: '';
+    display: block;
+    height: 11px;
+    margin: 14px -1px -1px;
+    background-image: radial-gradient(circle at 8px -3px, transparent 9px, #ffffff 9.5px);
+    background-size: 18px 12px;
+    background-repeat: repeat-x;
+    border-radius: 0 0 11px 11px;
+}
+
+/* Divisor punteado de recibo */
+.tear {
+    border-top: 2px dashed #d6cfc2;
+}
+
+/* ── Motion: entrada escalonada (respeta reduced motion) ── */
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes rise-up {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: none; }
+    }
+    .rise > * {
+        animation: rise-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .rise > *:nth-child(2) { animation-delay: 60ms; }
+    .rise > *:nth-child(3) { animation-delay: 120ms; }
+    .rise > *:nth-child(4) { animation-delay: 180ms; }
+    .rise > *:nth-child(5) { animation-delay: 240ms; }
+    .rise > *:nth-child(n+6) { animation-delay: 300ms; }
+}
