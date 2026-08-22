@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Panel') · Mi Bar</title>
+    <title>@yield('title', 'Panel') · MARGARITA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
 {{-- Nav móvil --}}
 <header class="md:hidden sticky top-0 z-40 border-b border-caoba/60 bg-tinta text-white shadow-lg shadow-tinta/20">
     <div class="flex items-center justify-between px-4 py-3">
-        <a href="{{ route('panel.dashboard') }}" class="font-display text-lg leading-none tracking-wide text-ambar">MI BAR</a>
+        <a href="{{ route('panel.dashboard') }}" class="font-display text-lg leading-none tracking-wide text-ambar">MARGARITA</a>
         <form action="{{ route('logout') }}" method="POST" aria-label="Cerrar sesión" title="{{ auth()->user()->name }}">
             @csrf
             <button type="submit" class="rounded-md px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-stone-300 hover:bg-caoba hover:text-white">Salir ⏻</button>
@@ -42,7 +42,7 @@
     {{-- Sidebar escritorio --}}
     <aside class="fixed inset-y-0 left-0 hidden w-60 flex-col bg-tinta text-stone-300 md:flex">
         <a href="{{ route('panel.dashboard') }}" class="border-b border-caoba/70 px-5 py-6">
-            <p class="font-display text-xl leading-none tracking-wide text-ambar">MI BAR</p>
+            <p class="font-display text-xl leading-none tracking-wide text-ambar">MARGARITA</p>
             <p class="mt-2 font-mono text-[11px] uppercase tracking-widest text-stone-400">Inventario · Caja</p>
         </a>
         <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4" aria-label="Secciones">
