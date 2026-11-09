@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+[x-cloak] {
+    display: none !important;
+}
+
 @layer components {
     .btn-primary {
         @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-ambar px-4 py-2.5 text-sm font-bold text-tinta shadow-sm transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta active:translate-y-px;

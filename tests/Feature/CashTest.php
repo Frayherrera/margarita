@@ -21,7 +21,7 @@ class CashTest extends TestCase
             'amount' => 500000,
             'method' => 'efectivo',
             'occurred_at' => today()->toDateString(),
-        ])->assertRedirect(route('panel.caja.index'));
+        ])->assertRedirect(route('panel.dashboard'));
 
         $this->post('/panel/caja', [
             'type' => 'egreso',

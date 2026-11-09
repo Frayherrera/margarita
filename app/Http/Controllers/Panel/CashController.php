@@ -54,7 +54,7 @@ class CashController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('panel.caja.index')->with('success', 'Movimiento de caja registrado.');
+        return redirect()->route('panel.dashboard')->with('success', 'Movimiento de caja registrado.');
     }
 
     public function destroy(CashMovement $cashMovement)

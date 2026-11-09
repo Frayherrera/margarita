@@ -7,7 +7,10 @@
         <h1 class="font-display text-3xl leading-tight tracking-wide">¡Buenas, {{ strtok(auth()->user()->name, ' ') }}!</h1>
         <p class="mt-1.5 font-mono text-xs uppercase tracking-widest text-stone-500">{{ now()->translatedFormat('l d \d\e F \d\e Y') }}</p>
     </div>
-    <a href="{{ route('panel.caja.index') }}" class="btn-primary hidden sm:inline-flex">Registrar movimiento de caja</a>
+    <div class="flex flex-wrap gap-2">
+        <a href="{{ route('panel.inventario.index', ['type' => 'salida', 'reason' => 'venta']) }}" class="btn-ghost">Venta</a>
+        <a href="{{ route('panel.inventario.index', ['type' => 'entrada', 'reason' => 'compra']) }}" class="btn-primary">Compra</a>
+    </div>
 </div>
 
 <div class="rise mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">

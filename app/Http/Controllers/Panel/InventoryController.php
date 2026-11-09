@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MovementRequest;
+use App\Models\CashMovement;
 use App\Models\InvMovement;
 use App\Models\InvProduct;
 use Illuminate\Support\Facades\DB;
@@ -48,16 +49,44 @@ class InventoryController extends Controller
             if ($request->type === 'entrada') {
                 $product->increment('current_stock', $request->quantity);
 
-                if ($request->reason === 'compra' && $request->unit_cost) {
-                    $product->update(['purchase_price' => $request->unit_cost]);
+                if ($request->reason === 'compra') {
+                    if ($request->unit_cost) {
+                        $product->update(['purchase_price' => $request->unit_cost]);
+                    }
+
+                    $unitCost = (float) ($request->unit_cost ?? $product->purchase_price ?? 0);
+
+                    CashMovement::create([
+                        'type' => 'egreso',
+                        'concept' => "Compra: {$product->name} × {$request->quantity} {$product->unit}",
+                        'amount' => $unitCost * (float) $request->quantity,
+                        'method' => $request->method ?: 'efectivo',
+                        'occurred_at' => $request->moved_at,
+                        'notes' => $request->notes,
+                        'user_id' => auth()->id(),
+                    ]);
                 }
             } else {
                 $product->decrement('current_stock', $request->quantity);
+
+                if ($request->reason === 'venta') {
+                    $unitPrice = (float) ($request->unit_cost ?? $product->sale_price ?? 0);
+
+                    CashMovement::create([
+                        'type' => 'ingreso',
+                        'concept' => "Venta: {$product->name} × {$request->quantity} {$product->unit}",
+                        'amount' => $unitPrice * (float) $request->quantity,
+                        'method' => $request->method ?: 'efectivo',
+                        'occurred_at' => $request->moved_at,
+                        'notes' => $request->notes,
+                        'user_id' => auth()->id(),
+                    ]);
+                }
             }
         });
 
         return redirect()
-            ->route('panel.inventario.index')
+            ->route('panel.dashboard')
             ->with('success', 'Movimiento registrado correctamente.');
     }
 }

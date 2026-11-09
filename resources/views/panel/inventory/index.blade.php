@@ -7,7 +7,7 @@
 
 <section class="card mb-8 p-5 sm:p-6">
     <h2 class="font-mono text-xs font-semibold uppercase tracking-widest text-stone-400">Registrar movimiento</h2>
-    <form action="{{ route('panel.inventario.store') }}" method="POST" class="mt-4 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-3">
+    <form action="{{ route('panel.inventario.store') }}" method="POST" x-data="{ reason: @js(old('reason', request('reason', 'compra'))) }" class="mt-4 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-3">
         @csrf
         <div class="sm:col-span-3">
             <label class="field-label" for="inv_product_id">Producto *</label>
@@ -24,15 +24,15 @@
             <label class="field-label" for="type">Tipo *</label>
             <select id="type" name="type" required class="input">
                 @foreach (App\Models\InvMovement::TYPES as $t)
-                    <option value="{{ $t }}" @selected(old('type', 'entrada') === $t)>@if($t === 'entrada')↑ Entrada @else ↓ Salida @endif</option>
+                    <option value="{{ $t }}" @selected(old('type', request('type', 'entrada')) === $t)>@if($t === 'entrada')↑ Entrada @else ↓ Salida @endif</option>
                 @endforeach
             </select>
         </div>
         <div>
             <label class="field-label" for="reason">Motivo *</label>
-            <select id="reason" name="reason" required class="input capitalize">
+            <select id="reason" name="reason" x-model="reason" required class="input capitalize">
                 @foreach (App\Models\InvMovement::REASONS as $r)
-                    <option value="{{ $r }}" @selected(old('reason', 'compra') === $r)>{{ ucfirst($r) }}</option>
+                    <option value="{{ $r }}" @selected(old('reason', request('reason', 'compra')) === $r)>{{ ucfirst($r) }}</option>
                 @endforeach
             </select>
         </div>
@@ -40,13 +40,22 @@
             <label class="field-label" for="quantity">Cantidad *</label>
             <input id="quantity" name="quantity" type="number" step="0.01" min="0.01" inputmode="decimal" required value="{{ old('quantity') }}" class="input font-mono">
         </div>
+        <div x-show="reason === 'venta' || reason === 'compra'">
+            <label class="field-label" for="method">Método de pago</label>
+            <select id="method" name="method" class="input capitalize">
+                @foreach (App\Models\CashMovement::METHODS as $m)
+                    <option value="{{ $m }}" @selected(old('method', 'efectivo') === $m)>{{ ucfirst($m) }}</option>
+                @endforeach
+            </select>
+            <p class="mt-1 text-xs text-stone-400">Con este método se registra el movimiento en caja.</p>
+        </div>
         <div>
-            <label class="field-label" for="unit_cost">Costo unitario</label>
+            <label class="field-label" for="unit_cost">Costo / precio unitario</label>
             <div class="relative">
                 <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 pt-1.5 font-mono text-sm text-stone-400">$</span>
                 <input id="unit_cost" name="unit_cost" type="number" step="1" min="0" inputmode="numeric" value="{{ old('unit_cost') }}" class="input pl-7 font-mono">
             </div>
-            <p class="mt-1 text-xs text-stone-400">En compras actualiza el precio del producto.</p>
+            <p class="mt-1 text-xs text-stone-400">En compras actualiza el precio de compra y suma el egreso a caja. En ventas suma el ingreso a caja. Si lo dejas vacío se usa el precio del producto.</p>
         </div>
         <div>
             <label class="field-label" for="moved_at">Fecha *</label>
