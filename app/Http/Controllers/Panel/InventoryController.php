@@ -8,6 +8,7 @@ use App\Models\CashMovement;
 use App\Models\InvMovement;
 use App\Models\InvProduct;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class InventoryController extends Controller
 {
@@ -27,66 +28,76 @@ class InventoryController extends Controller
 
         return view('panel.inventory.index', [
             'movements' => $movements,
-            'products' => InvProduct::orderBy('name')->get(['id', 'name', 'unit', 'current_stock']),
+            'products' => InvProduct::orderBy('name')->get(['id', 'name', 'unit', 'current_stock', 'purchase_price', 'sale_price']),
         ]);
     }
 
     public function store(MovementRequest $request)
     {
+        $count = count($request->items);
+
         DB::transaction(function () use ($request) {
-            $product = InvProduct::lockForUpdate()->findOrFail($request->inv_product_id);
+            $products = InvProduct::whereIn('id', collect($request->items)->pluck('inv_product_id'))
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
 
-            $product->movements()->create([
-                'type' => $request->type,
-                'reason' => $request->reason,
-                'quantity' => $request->quantity,
-                'unit_cost' => $request->unit_cost,
-                'moved_at' => $request->moved_at,
-                'notes' => $request->notes,
-                'user_id' => auth()->id(),
-            ]);
+            $isPurchase = $request->type === 'entrada' && $request->reason === 'compra';
+            $isSale = $request->type === 'salida' && $request->reason === 'venta';
 
-            if ($request->type === 'entrada') {
-                $product->increment('current_stock', $request->quantity);
+            $cashTotal = 0;
+            $cashLines = [];
 
-                if ($request->reason === 'compra') {
-                    if ($request->unit_cost) {
-                        $product->update(['purchase_price' => $request->unit_cost]);
+            foreach ($request->items as $item) {
+                $product = $products[$item['inv_product_id']];
+                $quantity = (float) $item['quantity'];
+                $unitCost = $item['unit_cost'] ?? null;
+
+                $product->movements()->create([
+                    'type' => $request->type,
+                    'reason' => $request->reason,
+                    'quantity' => $quantity,
+                    'unit_cost' => $unitCost,
+                    'moved_at' => $request->moved_at,
+                    'notes' => $request->notes,
+                    'user_id' => auth()->id(),
+                ]);
+
+                if ($request->type === 'entrada') {
+                    $product->increment('current_stock', $quantity);
+                } else {
+                    $product->decrement('current_stock', $quantity);
+                }
+
+                if ($isPurchase) {
+                    if ($unitCost) {
+                        $product->update(['purchase_price' => $unitCost]);
                     }
-
-                    $unitCost = (float) ($request->unit_cost ?? $product->purchase_price ?? 0);
-
-                    CashMovement::create([
-                        'type' => 'egreso',
-                        'concept' => "Compra: {$product->name} × {$request->quantity} {$product->unit}",
-                        'amount' => $unitCost * (float) $request->quantity,
-                        'method' => $request->method ?: 'efectivo',
-                        'occurred_at' => $request->moved_at,
-                        'notes' => $request->notes,
-                        'user_id' => auth()->id(),
-                    ]);
+                    $cashTotal += (float) ($unitCost ?? $product->purchase_price ?? 0) * $quantity;
+                } elseif ($isSale) {
+                    $cashTotal += (float) ($unitCost ?? $product->sale_price ?? 0) * $quantity;
                 }
-            } else {
-                $product->decrement('current_stock', $request->quantity);
 
-                if ($request->reason === 'venta') {
-                    $unitPrice = (float) ($request->unit_cost ?? $product->sale_price ?? 0);
+                $cashLines[] = "{$product->name} × " . qty($quantity);
+            }
 
-                    CashMovement::create([
-                        'type' => 'ingreso',
-                        'concept' => "Venta: {$product->name} × {$request->quantity} {$product->unit}",
-                        'amount' => $unitPrice * (float) $request->quantity,
-                        'method' => $request->method ?: 'efectivo',
-                        'occurred_at' => $request->moved_at,
-                        'notes' => $request->notes,
-                        'user_id' => auth()->id(),
-                    ]);
-                }
+            if ($isPurchase || $isSale) {
+                CashMovement::create([
+                    'type' => $isPurchase ? 'egreso' : 'ingreso',
+                    'concept' => Str::limit(($isPurchase ? 'Compra: ' : 'Venta: ') . implode(', ', $cashLines), 250),
+                    'amount' => $cashTotal,
+                    'method' => $request->method ?: 'efectivo',
+                    'occurred_at' => $request->moved_at,
+                    'notes' => $request->notes,
+                    'user_id' => auth()->id(),
+                ]);
             }
         });
 
         return redirect()
             ->route('panel.dashboard')
-            ->with('success', 'Movimiento registrado correctamente.');
+            ->with('success', $count === 1
+                ? 'Movimiento registrado correctamente.'
+                : "{$count} movimientos registrados correctamente.");
     }
 }
